@@ -54,9 +54,9 @@ class ToDoPatchModel:
 
     CATEGORY = "_for_testing"
 
-    def patch(self, model, downsample_factor_1, downsample_factor_2):
+    def patch(self, model, downsample_factor_depth_1, downsample_factor_depth_2):
         def todo_m(q, k, v, extra_options):
-            m = get_functions(q, downsample_factor_1, downsample_factor_2, extra_options["original_shape"])
+            m = get_functions(q, downsample_factor_depth_1, downsample_factor_depth_2, extra_options["original_shape"])
             return q, m(k), m(v)
 
 
