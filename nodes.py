@@ -5,16 +5,8 @@ import torch.nn.functional as F
 def up_or_downsample(item, cur_w, cur_h, new_w, new_h, method="nearest"):
     batch_size = item.shape[0]
 
-    item = item.reshape(batch_size, cur_h, cur_w, -1)
-    item = item.permute(0, 3, 1, 2)
-    df = cur_h // new_h
-    if method in "max_pool":
-        item = F.max_pool2d(item, kernel_size=df, stride=df, padding=0)
-    elif method in "avg_pool":
-        item = F.avg_pool2d(item, kernel_size=df, stride=df, padding=0)
-    else:
-        item = F.interpolate(item, size=(new_h, new_w), mode=method)
-    item = item.permute(0, 2, 3, 1)
+    item = item.reshape(batch_size, cur_h, cur_w, -1).permute(0, 3, 1, 2)
+    item = F.interpolate(item, size=(new_h, new_w), mode=method).permute(0, 2, 3, 1)
     item = item.reshape(batch_size, new_h * new_w, -1)
 
     return item
@@ -58,7 +50,6 @@ class ToDoPatchModel:
         def todo_m(q, k, v, extra_options):
             m = get_functions(q, downsample_factor_depth_1, downsample_factor_depth_2, extra_options["original_shape"])
             return q, m(k), m(v)
-
 
         m = model.clone()
         m.set_model_attn1_patch(todo_m)
